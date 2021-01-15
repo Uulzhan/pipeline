@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+    options {
+        timeout(time: 30, unit: 'MINUTES') 
+    }
+    stages {
+        stage ('1-Approval') {	
+	   input {
+	       message "Do you want to proceed for production deployment?"	       
+	   }  
+	   steps {
+	       echo "Approved"
+	   }
+	}     
+        stage ('2-Deploy to Prod') {
+            steps {
+                echo "Start of Stage Deploy"
+		echo "Deploying......."
+		sshPublisher(publishers: [sshPublisherDesc(configName: 'Prod', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'cd /var/www/html ; sudo curl -O https://raw.githubusercontent.com/Uulzhan/jenkins-project/master/index.html; sudo systemctl restart httpd', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '**/*.yml')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+		echo "End of Stage Deploy"
+            }
+        }
+    }        	
+}
